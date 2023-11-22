@@ -12,8 +12,8 @@ import google.generativeai as palm
 
 
 
-#DEBUG = False
-DEBUG = True
+DEBUG = False
+#DEBUG = True
 
 def get_palm_completion(endpoint, prompt, context_window, model_name="chat-bison-32k",model=None, settings=None, grammar=None):
     """
