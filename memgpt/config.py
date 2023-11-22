@@ -84,6 +84,14 @@ class MemGPTConfig:
     azure_deployment: str = None
     azure_embedding_deployment: str = None
 
+    # model parameters: google
+    google_key: str = None
+    google_endpoint: str = None
+    google_embedding_key: str = None
+    google_project: str = None
+    google_location: str = None
+    google_credentials: str = None
+
     # persona parameters
     persona: str = personas.DEFAULT
     human: str = humans.DEFAULT
@@ -152,6 +160,12 @@ class MemGPTConfig:
                 "azure_version": get_field(config, "azure", "version"),
                 "azure_deployment": get_field(config, "azure", "deployment"),
                 "azure_embedding_deployment": get_field(config, "azure", "embedding_deployment"),
+                "google_key": get_field(config, "google", "key"),
+                "google_endpoint": get_field(config, "google", "endpoint"),
+                "google_embedding_key": get_field(config, "google", "embedding_key"),
+                "google_project": get_field(config, "google", "projectid"),
+                "google_location": get_field(config, "google", "location"),
+                "google_credentials": get_field(config, "google", "credentials"),
                 "embedding_endpoint": get_field(config, "embedding", "embedding_endpoint"),
                 "embedding_endpoint_type": get_field(config, "embedding", "embedding_endpoint_type"),
                 "embedding_dim": get_field(config, "embedding", "embedding_dim"),
@@ -199,7 +213,13 @@ class MemGPTConfig:
         set_field(config, "azure", "version", self.azure_version)
         set_field(config, "azure", "deployment", self.azure_deployment)
         set_field(config, "azure", "embedding_deployment", self.azure_embedding_deployment)
-
+        # security credentials: google
+        set_field(config, "google", "key", self.google_key)
+        set_field(config, "google", "endpoint", self.google_endpoint)
+        set_field(config, "google", "embedding_key", self.google_embedding_key)
+        set_field(config, "google", "project", self.google_project)
+        set_field(config, "google", "location", self.google_location)
+        set_field(config, "google", "credentials", self.google_credentials)
         # embeddings
         set_field(config, "embedding", "embedding_endpoint_type", self.embedding_endpoint_type)
         set_field(config, "embedding", "embedding_endpoint", self.embedding_endpoint)

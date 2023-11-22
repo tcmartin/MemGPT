@@ -34,7 +34,13 @@ def get_azure_credentials():
 def get_openai_credentials():
     openai_key = os.getenv("OPENAI_API_KEY")
     return openai_key
-
+def get_google_credentials():
+    #google_project = os.getenv("GOOGLE_PROJECT")
+    #google_location = os.getenv("GOOGLE_LOCATION")
+    #google_credentials = os.getenv("GOOGLE_CREDENTIALS")
+    google_embedding_key = os.getenv("GOOGLE_EMBEDDING_KEY")
+    google_key = os.getenv("GOOGLE_KEY")
+    return google_key, google_embedding_key
 
 def configure_llm_endpoint(config: MemGPTConfig):
     # configure model endpoint
@@ -46,7 +52,7 @@ def configure_llm_endpoint(config: MemGPTConfig):
         default_model_endpoint_type = "local"
 
     provider = questionary.select(
-        "Select LLM inference provider:", choices=["openai", "azure", "local"], default=default_model_endpoint_type
+        "Select LLM inference provider:", choices=["openai", "azure", "local", "google"], default=default_model_endpoint_type
     ).ask()
 
     # set: model_endpoint_type, model_endpoint
@@ -58,6 +64,9 @@ def configure_llm_endpoint(config: MemGPTConfig):
     elif provider == "azure":
         model_endpoint_type = "azure"
         _, model_endpoint, _, _, _ = get_azure_credentials()
+    elif provider == "google":
+        model_endpoint_type = "google"
+        model_endpoint = "https://language.googleapis.com/v1beta2"
     else:  # local models
         backend_options = ["webui", "webui-legacy", "llamacpp", "koboldcpp", "ollama", "lmstudio", "openai"]
         default_model_endpoint_type = None
@@ -167,7 +176,7 @@ def configure_embedding_endpoint(config: MemGPTConfig):
 
     embedding_endpoint_type, embedding_endpoint, embedding_dim = None, None, None
     embedding_provider = questionary.select(
-        "Select embedding provider:", choices=["openai", "azure", "local"], default=default_embedding_endpoint_type
+        "Select embedding provider:", choices=["openai", "azure", "local", "google"], default=default_embedding_endpoint_type
     ).ask()
     if embedding_provider == "openai":
         embedding_endpoint_type = "openai"
@@ -177,6 +186,10 @@ def configure_embedding_endpoint(config: MemGPTConfig):
         embedding_endpoint_type = "azure"
         _, _, _, _, embedding_endpoint = get_azure_credentials()
         embedding_dim = 1536
+    elif embedding_provider == "google":
+        embedding_endpoint_type = "palm"
+        embedding_endpoint = None
+        embedding_dim = 768
     else:  # local models
         embedding_endpoint_type = "local"
         embedding_endpoint = None
@@ -249,6 +262,7 @@ def configure():
     # check credentials
     azure_key, azure_endpoint, azure_version, azure_deployment, azure_embedding_deployment = get_azure_credentials()
     openai_key = get_openai_credentials()
+    google_embedding_key, google_key = get_google_credentials()
     if model_endpoint_type == "azure" or embedding_endpoint_type == "azure":
         if all([azure_key, azure_endpoint, azure_version]):
             print(f"Using Microsoft endpoint {azure_endpoint}.")
@@ -287,6 +301,11 @@ def configure():
         azure_version=azure_version,
         azure_deployment=azure_deployment,
         azure_embedding_deployment=azure_embedding_deployment,
+        #google_project=google_project,
+        #google_location=google_location,
+        #google_credentials=google_credentials,
+        google_embedding_key=google_embedding_key,
+        google_key=google_key,
         # storage
         archival_storage_type=archival_storage_type,
         archival_storage_uri=archival_storage_uri,

@@ -24,6 +24,11 @@ def embedding_model():
             api_type="azure",
             api_version=config.azure_version,
         )
+    elif endpoint == "palm":
+        from llama_index.embeddings import GooglePaLMEmbedding
+        model_name = "models/embedding-gecko-001"
+        embed_model = GooglePaLMEmbedding(model_name=model_name, api_key=config.google_embedding_key)
+        return embed_model
     else:
         # default to hugging face model
         from llama_index.embeddings import HuggingFaceEmbedding

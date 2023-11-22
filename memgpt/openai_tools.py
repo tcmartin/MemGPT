@@ -6,6 +6,7 @@ import time
 from typing import Callable, TypeVar
 
 from memgpt.local_llm.chat_completion_proxy import get_chat_completion
+from memgpt.local_llm.palm.api import get_palm_completion
 
 HOST = os.getenv("OPENAI_API_BASE")
 HOST_TYPE = os.getenv("BACKEND_TYPE")  # default None == ChatCompletion
@@ -23,7 +24,7 @@ def retry_with_exponential_backoff(
     exponential_base: float = 2,
     jitter: bool = True,
     max_retries: int = 20,
-    errors: tuple = (openai.error.RateLimitError,),
+    errors: tuple = (Exception,),
 ):
     """Retry a function with exponential backoff."""
 
@@ -108,6 +109,14 @@ def chat_completion_with_backoff(agent_config, **kwargs):
             kwargs["engine"] = MODEL_TO_AZURE_ENGINE[config.model]
             del kwargs["model"]
         return openai.ChatCompletion.create(**kwargs)
+    elif agent_config.model_endpoint_type == "google":
+        # palm
+        config = MemGPTConfig.load()  # load credentials (currently not stored in agent config) 
+        kwargs["context_window"] = agent_config.context_window  # specify for open LLMs
+        kwargs["endpoint"] = agent_config.model_endpoint  # specify for open LLMs
+        kwargs["endpoint_type"] = "palm"  # specify for open LLMs
+        kwargs["wrapper"] = agent_config.model_wrapper  # specify for open LLMs
+        return get_chat_completion(**kwargs)
     else:  # local model
         kwargs["context_window"] = agent_config.context_window  # specify for open LLMs
         kwargs["endpoint"] = agent_config.model_endpoint  # specify for open LLMs
@@ -126,6 +135,9 @@ def create_embedding_with_backoff(**kwargs):
         else:
             kwargs["engine"] = kwargs["model"]
             kwargs.pop("model")
+    if using_palm():
+        kwargs["engine"] = kwargs["model"]
+        kwargs.pop("model")
     return openai.Embedding.create(**kwargs)
 
 

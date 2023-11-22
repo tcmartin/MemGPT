@@ -11,12 +11,12 @@ from memgpt import utils
 from memgpt.openai_tools import get_embedding_with_backoff, chat_completion_with_backoff
 from llama_index import (
     VectorStoreIndex,
-    EmptyIndex,
     get_response_synthesizer,
     load_index_from_storage,
     StorageContext,
     Document,
 )
+from llama_index.indices.empty import EmptyIndex
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.retrievers import VectorIndexRetriever
